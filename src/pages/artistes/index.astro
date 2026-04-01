@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArtistCard from '../../components/ArtistCard.astro';
+import { getArtistes } from '../../lib/sanity';
+
+const artistes = await getArtistes();
+---
+
+<Layout title="Artistes">
+  <section class="section">
+    <div class="container">
+      <h1 class="section-title">Artistes</h1>
+      <div class="grid-3">
+        {artistes.map(artista => (
+          <ArtistCard {...artista} />
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

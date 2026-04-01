@@ -1,0 +1,20 @@
+{
+  "name": "espai-barri-vell",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.2",
+    "@portabletext/to-html": "^2.0.17",
+    "@sanity/client": "^6.29.1",
+    "astro": "^4.16.19",
+    "stripe": "^16.12.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

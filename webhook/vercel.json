@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/stripe-webhook.ts": {
+      "runtime": "@vercel/node@4.x"
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" }
+  ]
+}

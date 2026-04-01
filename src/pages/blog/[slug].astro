@@ -1,0 +1,45 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPosts, getPostBySlug } from '../../lib/sanity';
+import { toHTML } from '@portabletext/to-html';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map(p => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug);
+if (!post) return Astro.redirect('/blog');
+
+const date = new Date(post.dataPublicacio).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Layout title={post.titol} image={post.imatgePrincipal}>
+  <article class="section">
+    <div class="container post-layout">
+      <p class="breadcrumb"><a href="/blog">Blog</a> / {post.titol}</p>
+      {post.imatgePrincipal && <img src={post.imatgePrincipal} alt={post.titol} class="hero-image" />}
+      <header class="post-header">
+        <time class="post-date">{date}</time>
+        <h1>{post.titol}</h1>
+      </header>
+      {post.cos && <div class="prose" set:html={toHTML(post.cos)} />}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .post-layout { max-width: 760px; }
+  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 1.5rem; }
+  .breadcrumb a { color: var(--color-gray-dark); }
+  .hero-image { width: 100%; max-height: 460px; object-fit: cover; margin-bottom: var(--spacing-md); }
+  .post-date { font-size: 0.75rem; color: var(--color-gray-light); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem; }
+  .post-header { margin-bottom: var(--spacing-md); }
+  .prose { font-size: 1.05rem; line-height: 1.9; color: var(--color-gray-dark); }
+  .prose p { margin-bottom: 1.2em; }
+  .prose h2 { font-size: 1.4rem; margin: 2em 0 0.75em; color: var(--color-black); }
+  .prose h3 { font-size: 1.1rem; margin: 1.5em 0 0.5em; color: var(--color-black); }
+  .prose img { margin: 1.5em 0; }
+  .prose blockquote { border-left: 3px solid var(--color-black); padding-left: 1.5rem; margin: 1.5em 0; font-style: italic; color: var(--color-gray-dark); }
+</style>

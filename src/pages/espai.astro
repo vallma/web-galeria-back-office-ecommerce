@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPaginaEspai } from '../lib/sanity';
+import { toHTML } from '@portabletext/to-html';
+
+const espai = await getPaginaEspai();
+---
+
+<Layout title="Espai" description="Coneix l'Espai Barri Vell, galeria d'art al cor de Girona">
+  <section class="section">
+    <div class="container espai-layout">
+      <div class="espai-content">
+        <h1>{espai?.titol ?? "L'Espai"}</h1>
+        {espai?.cos && (
+          <div class="prose" set:html={toHTML(espai.cos)} />
+        )}
+      </div>
+      {espai?.imatges?.length > 0 && (
+        <div class="espai-images">
+          {espai.imatges.map((url: string) => (
+            <img src={url} alt="Espai Barri Vell" loading="lazy" />
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .espai-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); align-items: start; }
+  .espai-content h1 { margin-bottom: var(--spacing-md); }
+  .prose { font-size: 1rem; line-height: 1.8; color: var(--color-gray-dark); }
+  .prose p { margin-bottom: 1em; }
+  .espai-images { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+  .espai-images img { width: 100%; }
+  @media (max-width: 768px) { .espai-layout { grid-template-columns: 1fr; } }
+</style>

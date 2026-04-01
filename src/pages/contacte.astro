@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Contacte" description="Contacta amb l'Espai Barri Vell — Plaça dels Lledoners, 1, Girona">
+  <section class="section">
+    <div class="container contacte-layout">
+      <div class="contacte-info">
+        <h1>Contacte</h1>
+
+        <div class="info-block">
+          <h3>Adreça</h3>
+          <p>Plaça dels Lledoners, 1<br />17004 Girona</p>
+        </div>
+
+        <div class="info-block">
+          <h3>Telèfon</h3>
+          <p><a href="tel:+34648869034">+34 648 869 034</a></p>
+        </div>
+
+        <div class="info-block">
+          <h3>Correu electrònic</h3>
+          <p><a href="mailto:espaibarrivell@gmail.com">espaibarrivell@gmail.com</a></p>
+        </div>
+
+        <div class="info-block">
+          <h3>Horari</h3>
+          <table class="hours-table">
+            <tr><td>Dimarts–Divendres</td><td>10:00–13:00, 15:00–18:00</td></tr>
+            <tr><td>Dissabte</td><td>11:00–19:00</td></tr>
+            <tr><td>Diumenge–Dilluns</td><td>Tancat</td></tr>
+          </table>
+        </div>
+
+        <div class="info-block">
+          <h3>Xarxes socials</h3>
+          <a href="https://instagram.com/espaibarrivell" target="_blank" rel="noopener" class="social-link">Instagram @espaibarrivell</a>
+        </div>
+      </div>
+
+      <div class="contacte-form-map">
+        <form class="contact-form" name="contacte" method="POST">
+          <h2>Envia'ns un missatge</h2>
+          <div class="form-group">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Correu electrònic</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="missatge">Missatge</label>
+            <textarea id="missatge" name="missatge" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Enviar missatge</button>
+        </form>
+
+        <div class="map-embed">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2982.3!2d2.8255!3d41.9867!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12bae72f1234!2sPla%C3%A7a%20dels%20Lledoners%2C%201%2C%2017004%20Girona!5e0!3m2!1sca!2ses!4v1234567890"
+            width="100%"
+            height="300"
+            style="border:0;"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Mapa Espai Barri Vell"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contacte-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--spacing-lg); }
+  h1 { margin-bottom: var(--spacing-md); }
+  .info-block { margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--color-border); }
+  .info-block h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray-light); margin-bottom: 0.5rem; }
+  .info-block p, .info-block a { font-size: 1rem; color: var(--color-gray-dark); }
+  .hours-table { border-collapse: collapse; font-size: 0.9rem; }
+  .hours-table td { padding: 0.3rem 1rem 0.3rem 0; color: var(--color-gray-dark); vertical-align: top; }
+  .hours-table td:first-child { font-weight: 500; color: var(--color-black); min-width: 160px; }
+  .social-link { font-size: 0.9rem; color: var(--color-gray-dark); }
+  .contacte-form-map { display: flex; flex-direction: column; gap: var(--spacing-md); }
+  .contact-form h2 { margin-bottom: var(--spacing-sm); font-size: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+  .form-group label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--color-white);
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--color-black); }
+  .map-embed { border: 1px solid var(--color-border); overflow: hidden; }
+  @media (max-width: 768px) { .contacte-layout { grid-template-columns: 1fr; } }
+</style>

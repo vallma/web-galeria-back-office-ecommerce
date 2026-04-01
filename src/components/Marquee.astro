@@ -1,0 +1,71 @@
+---
+interface Props {
+  items?: string[];
+  speed?: number;
+}
+const {
+  items = ['Espai Barri Vell', 'Art Contemporani', 'Girona', 'Exposicions', 'Artistes', 'Obres Originals'],
+  speed = 26,
+} = Astro.props;
+
+const dotColors = [
+  'var(--color-brand-teal)',
+  'var(--color-brand-orange)',
+  'var(--color-brand-blue)',
+  'var(--color-brand-red)',
+  'var(--color-brand-yellow)',
+  'var(--color-brand-teal)',
+];
+
+const allItems = [...items, ...items];
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" style={`animation-duration: ${speed}s`}>
+    {allItems.map((item, i) => (
+      <span class="marquee-item">
+        {item}<span class="marquee-dot" style={`color: ${dotColors[i % dotColors.length]}`}>·</span>
+      </span>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.9rem 0;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll linear infinite;
+  }
+
+  .marquee-item {
+    font-family: var(--font-serif);
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--color-gray-dark);
+    white-space: nowrap;
+    padding: 0 1.75rem;
+  }
+
+  .marquee-dot {
+    margin-left: 1.75rem;
+    font-weight: 700;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+const currentYear = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <p class="footer-logo">EBV</p>
+      <p class="footer-tagline">Espai d'art al cor de Girona</p>
+    </div>
+    <nav class="footer-nav">
+      <div class="footer-col">
+        <h3>Espai</h3>
+        <ul>
+          <li><a href="/espai">Qui som</a></li>
+          <li><a href="/exposicions">Exposicions</a></li>
+          <li><a href="/artistes">Artistes</a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Botiga</h3>
+        <ul>
+          <li><a href="/botiga">Totes les obres</a></li>
+          <li><a href="/contacte">Contacte</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Contacte</h3>
+        <address>
+          <p>Plaça dels Lledoners, 1</p>
+          <p>17004 Girona</p>
+          <p><a href="tel:+34648869034">+34 648 869 034</a></p>
+          <p><a href="mailto:espaibarrivell@gmail.com">espaibarrivell@gmail.com</a></p>
+        </address>
+        <div class="footer-hours">
+          <p>Dim–Div: 10–13h, 15–18h</p>
+          <p>Dis: 11–19h</p>
+          <p>Diu–Dil: tancat</p>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <div class="footer-bottom container">
+    <p>&copy; {currentYear} Espai Barri Vell. Tots els drets reservats.</p>
+    <ul class="footer-legal">
+      <li><a href="/avis-legal">Avís legal</a></li>
+      <li><a href="/politica-privacitat">Privacitat</a></li>
+      <li><a href="/cookies">Cookies</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer { border-top: 1px solid var(--color-border); padding-top: var(--spacing-lg); }
+  .footer-inner { display: grid; grid-template-columns: 1fr 2fr; gap: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+  .footer-logo { font-size: 1.5rem; font-weight: 700; }
+  .footer-tagline { color: var(--color-gray-dark); font-size: 0.875rem; margin-top: 0.5rem; }
+  .footer-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
+  .footer-col h3 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray-light); margin-bottom: 1rem; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.5rem; }
+  .footer-col a { font-size: 0.875rem; color: var(--color-gray-dark); }
+  .footer-col a:hover { color: var(--color-black); }
+  address { font-style: normal; font-size: 0.875rem; color: var(--color-gray-dark); }
+  address p { margin-bottom: 0.25rem; }
+  .footer-hours { margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-gray-dark); }
+  .footer-hours p { margin-bottom: 0.2rem; }
+  .footer-bottom { border-top: 1px solid var(--color-border); padding: var(--spacing-md) 0; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-size: 0.8rem; color: var(--color-gray-light); }
+  .footer-legal { display: flex; list-style: none; gap: 1.5rem; }
+  .footer-legal a { font-size: 0.8rem; color: var(--color-gray-light); }
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr; }
+    .footer-nav { grid-template-columns: 1fr 1fr; }
+    .footer-bottom { flex-direction: column; gap: 0.75rem; text-align: center; }
+  }
+</style>

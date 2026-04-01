@@ -1,0 +1,149 @@
+---
+interface Props {
+  class?: string;
+  showText?: boolean;
+}
+const { class: className, showText = true } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox={showText ? "0 0 400 490" : "0 0 400 400"}
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath id="logo-clip">
+      <circle cx="200" cy="198" r="178"/>
+    </clipPath>
+  </defs>
+
+  <!-- White base circle -->
+  <circle cx="200" cy="198" r="178" fill="#ffffff"/>
+
+  <g clip-path="url(#logo-clip)">
+
+    <!-- Sky background -->
+    <rect x="0" y="0" width="400" height="400" fill="#72C4E0"/>
+
+    <!-- ── Left building (white silhouette) ─────────── -->
+    <path
+      d="M22,390
+         L22,215 L50,215 L50,192
+         L70,192 L70,156
+         L86,156 L86,103
+         Q106,70 126,103
+         L126,132 L145,132 L145,158
+         L164,158 L164,191
+         L180,191 L180,390 Z"
+      fill="#ffffff"
+    />
+
+    <!-- ── Right building (white silhouette) ──────── -->
+    <path
+      d="M194,390
+         L194,186 L220,186 L220,163
+         L262,163 L262,179
+         L390,179 L390,390 Z"
+      fill="#ffffff"
+    />
+
+    <!-- ── Building outlines ───────────────────────── -->
+    <path
+      d="M22,390
+         L22,215 L50,215 L50,192
+         L70,192 L70,156
+         L86,156 L86,103
+         Q106,70 126,103
+         L126,132 L145,132 L145,158
+         L164,158 L164,191
+         L180,191"
+      fill="none" stroke="#1c1c1c" stroke-width="4.5"
+      stroke-linecap="square" stroke-linejoin="miter"
+    />
+    <path
+      d="M194,390
+         L194,186 L220,186 L220,163
+         L262,163 L262,179
+         L390,179"
+      fill="none" stroke="#1c1c1c" stroke-width="4.5"
+      stroke-linecap="square" stroke-linejoin="miter"
+    />
+
+    <!-- ── Orange painting — portrait, left tower ─── -->
+    <rect x="90" y="173" width="38" height="72"
+          fill="#ffffff" stroke="#1c1c1c" stroke-width="4"/>
+    <rect x="96" y="179" width="26" height="60"
+          fill="#F4872A"/>
+
+    <!-- ── Red painting — landscape, right building ─ -->
+    <rect x="272" y="185" width="68" height="48"
+          fill="#ffffff" stroke="#1c1c1c" stroke-width="4"/>
+    <rect x="278" y="191" width="56" height="36"
+          fill="#D64045"/>
+
+    <!-- ── Teal painting — large landscape, lower ─── -->
+    <rect x="44" y="252" width="130" height="80"
+          fill="#ffffff" stroke="#1c1c1c" stroke-width="4"/>
+    <rect x="50" y="258" width="118" height="68"
+          fill="#4E8F85"/>
+
+    <!-- ── Yellow painting — smaller landscape ──────  -->
+    <rect x="196" y="256" width="92" height="60"
+          fill="#ffffff" stroke="#1c1c1c" stroke-width="4"/>
+    <rect x="202" y="262" width="80" height="48"
+          fill="#F5C225"/>
+
+    <!-- ── Concentric arcs — bottom ─────────────────
+         Center (205, 360), rings r_out / r_in
+         Path formula: M(cx-r_out),cy A r_out,r_out 0 0,1 (cx+r_out),cy
+                       L(cx+r_in),cy A r_in,r_in 0 0,0 (cx-r_in),cy Z
+    ─────────────────────────────────────────────── -->
+    <!-- Black ring 1: r=82/68 -->
+    <path d="M123,360 A82,82 0 0,1 287,360 L273,360 A68,68 0 0,0 137,360 Z"
+          fill="#1c1c1c"/>
+    <!-- White ring 2: r=68/54 -->
+    <path d="M137,360 A68,68 0 0,1 273,360 L259,360 A54,54 0 0,0 151,360 Z"
+          fill="#ffffff"/>
+    <!-- Black ring 3: r=54/40 -->
+    <path d="M151,360 A54,54 0 0,1 259,360 L245,360 A40,40 0 0,0 165,360 Z"
+          fill="#1c1c1c"/>
+    <!-- White ring 4: r=40/26 -->
+    <path d="M165,360 A40,40 0 0,1 245,360 L231,360 A26,26 0 0,0 179,360 Z"
+          fill="#ffffff"/>
+    <!-- Black ring 5: r=26/12 -->
+    <path d="M179,360 A26,26 0 0,1 231,360 L217,360 A12,12 0 0,0 193,360 Z"
+          fill="#1c1c1c"/>
+
+  </g>
+
+  <!-- Circle border (drawn over clip group) -->
+  <circle cx="200" cy="198" r="178"
+          fill="none" stroke="#1c1c1c" stroke-width="7"/>
+
+  <!-- ── Logotype text ───────────────────────────── -->
+  {showText && (
+    <>
+      <text
+        x="200" y="422"
+        text-anchor="middle"
+        font-family="'Arial Black', 'Franklin Gothic Heavy', Impact, sans-serif"
+        font-size="34"
+        font-weight="900"
+        fill="#1c1c1c"
+        letter-spacing="1.5"
+      >ESPAI BARRI VELL</text>
+
+      <text
+        x="200" y="458"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="16"
+        font-weight="400"
+        fill="#1c1c1c"
+        letter-spacing="7"
+      >GIRONA</text>
+    </>
+  )}
+</svg>

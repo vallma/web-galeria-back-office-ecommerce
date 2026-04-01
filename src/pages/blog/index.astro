@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getPosts } from '../../lib/sanity';
+
+const posts = await getPosts();
+---
+
+<Layout title="Blog">
+  <section class="section">
+    <div class="container">
+      <h1 class="section-title">Blog</h1>
+      <div class="grid-3">
+        {posts.map(post => <BlogCard {...post} />)}
+      </div>
+    </div>
+  </section>
+</Layout>

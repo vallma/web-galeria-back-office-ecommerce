@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ExhibitionCard from '../../components/ExhibitionCard.astro';
+import { getExposicions } from '../../lib/sanity';
+
+const exposicions = await getExposicions();
+---
+
+<Layout title="Exposicions">
+  <section class="section">
+    <div class="container">
+      <h1 class="section-title">Exposicions</h1>
+      <div class="grid-3">
+        {exposicions.map(exp => <ExhibitionCard {...exp} />)}
+      </div>
+    </div>
+  </section>
+</Layout>

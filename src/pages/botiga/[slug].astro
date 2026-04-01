@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getObres, getObraBySlug } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+  const obres = await getObres();
+  return obres.map(o => ({ params: { slug: o.slug } }));
+}
+
+const { slug } = Astro.params;
+const obra = await getObraBySlug(slug);
+if (!obra) return Astro.redirect('/botiga');
+---
+
+<Layout title={obra.titol} description={`${obra.titol} — ${obra.artista?.nom ?? ''} — Espai Barri Vell`} image={obra.imatges?.[0]}>
+  <section class="section">
+    <div class="container obra-layout">
+      <!-- Galeria d'imatges -->
+      <div class="obra-gallery">
+        {obra.imatges?.map((url: string, i: number) => (
+          <img
+            src={url}
+            alt={`${obra.titol} — imatge ${i + 1}`}
+            class:list={['gallery-img', { main: i === 0 }]}
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        ))}
+      </div>
+
+      <!-- Info i compra -->
+      <div class="obra-info">
+        <p class="breadcrumb"><a href="/botiga">Botiga</a></p>
+        {obra.artista && (
+          <p class="obra-artist">
+            <a href={`/artistes/${obra.artista.slug}`}>{obra.artista.nom}</a>
+          </p>
+        )}
+        <h1>{obra.titol}</h1>
+
+        <div class="obra-meta">
+          {obra.any && <p><span>Any</span> {obra.any}</p>}
+          {obra.tecnica && <p><span>Tècnica</span> {obra.tecnica}</p>}
+          {obra.dimensions && <p><span>Dimensions</span> {obra.dimensions}</p>}
+        </div>
+
+        <p class="obra-price">{obra.preu?.toLocaleString('ca-ES')} €</p>
+
+        {obra.sold
+          ? <p class="sold-msg">Aquesta obra ja ha estat venuda</p>
+          : (
+            <form method="POST" action="/api/checkout">
+              <input type="hidden" name="obraId" value={obra._id} />
+              <input type="hidden" name="obraSlug" value={slug} />
+              <button type="submit" class="btn btn-primary buy-btn">Adquirir obra</button>
+            </form>
+          )
+        }
+
+        <p class="obra-note">Obra original única. Transport inclòs a Espanya. Contacta'ns per a enviaments internacionals.</p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .obra-layout { display: grid; grid-template-columns: 1fr 420px; gap: var(--spacing-lg); align-items: start; }
+  .obra-gallery { display: flex; flex-direction: column; gap: 0.5rem; }
+  .gallery-img { width: 100%; }
+  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 0.75rem; }
+  .breadcrumb a { color: var(--color-gray-dark); }
+  .obra-artist { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-gray-light); margin-bottom: 0.5rem; }
+  .obra-artist a { color: var(--color-gray-dark); }
+  h1 { margin-bottom: var(--spacing-sm); }
+  .obra-meta { margin-bottom: var(--spacing-md); border-top: 1px solid var(--color-border); padding-top: var(--spacing-sm); }
+  .obra-meta p { display: flex; gap: 0.5rem; font-size: 0.875rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-border); }
+  .obra-meta span { color: var(--color-gray-light); min-width: 100px; }
+  .obra-price { font-size: 1.75rem; font-weight: 600; margin-bottom: var(--spacing-sm); }
+  .buy-btn { width: 100%; text-align: center; padding: 1rem; font-size: 0.9rem; }
+  .sold-msg { padding: 1rem; background: #f5f5f5; text-align: center; color: var(--color-gray-dark); font-size: 0.875rem; }
+  .obra-note { margin-top: 1rem; font-size: 0.8rem; color: var(--color-gray-light); line-height: 1.5; }
+  @media (max-width: 768px) { .obra-layout { grid-template-columns: 1fr; } }
+</style>

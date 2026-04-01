@@ -1,0 +1,233 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ExhibitionCard from '../components/ExhibitionCard.astro';
+import BlogCard from '../components/BlogCard.astro';
+import Marquee from '../components/Marquee.astro';
+import { getExposicions, getPosts } from '../lib/sanity';
+
+const exposicions = await getExposicions();
+const posts = await getPosts();
+const exposicionsRecents = exposicions.slice(0, 3);
+const postsRecents = posts.slice(0, 3);
+
+// Split h1 text into words for staggered reveal
+const heroWords = ["Espai", "d'art", "al", "cor", "de", "Girona"];
+---
+
+<Layout title="Inici" description="Espai Barri Vell — Espai d'art al cor de Girona. Exposicions, artistes i obra original.">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title" aria-label="Espai d'art al cor de Girona">
+        {heroWords.map((word, i) => (
+          <span class="hero-word" style={`animation-delay: ${i * 0.1}s`}>{word}</span>
+        ))}
+      </h1>
+      <div class="hero-line" aria-hidden="true"></div>
+      <p class="hero-sub">Descobreix l'art contemporani al casc antic de Girona</p>
+      <div class="hero-actions">
+        <a href="/exposicions" class="btn btn-primary">Exposicions actuals</a>
+        <a href="/botiga" class="btn">Botiga</a>
+      </div>
+    </div>
+  </section>
+
+  <Marquee />
+
+  <!-- Exposicions recents -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title reveal">Exposicions</h2>
+      <div class="grid-3 reveal-stagger">
+        {exposicionsRecents.map(exp => (
+          <div class="reveal-item">
+            <ExhibitionCard {...exp} />
+          </div>
+        ))}
+      </div>
+      <div class="section-footer reveal">
+        <a href="/exposicions" class="btn">Veure totes les exposicions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog -->
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title reveal">Descobreix què passa a l'Espai Barri Vell</h2>
+      <div class="grid-3 reveal-stagger">
+        {postsRecents.map(post => (
+          <div class="reveal-item">
+            <BlogCard {...post} />
+          </div>
+        ))}
+      </div>
+      <div class="section-footer reveal">
+        <a href="/blog" class="btn">Més actualitat</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section newsletter-section">
+    <div class="container newsletter-inner">
+      <div class="reveal">
+        <h2>Subscriu-te al nostre butlletí</h2>
+        <p>Rep informació sobre exposicions, artistes i events de l'Espai Barri Vell</p>
+      </div>
+      <form class="newsletter-form reveal" action="#" method="post">
+        <div class="input-wrap">
+          <input type="email" name="email" placeholder="El teu correu electrònic" required />
+          <span class="input-line" aria-hidden="true"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Subscriu-te</button>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ─── Hero ───────────────────────────────────────────────── */
+  .hero {
+    padding: var(--spacing-xl) 0;
+    border-bottom: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .hero-title {
+    max-width: 700px;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.35em;
+    line-height: 1.15;
+  }
+
+  .hero-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: word-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes word-reveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-line {
+    height: 1px;
+    background: var(--color-accent);
+    width: 0;
+    margin-bottom: var(--spacing-md);
+    animation: line-expand 1s ease 0.7s forwards;
+    max-width: 600px;
+  }
+
+  @keyframes line-expand {
+    to { width: 100%; }
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--color-gray-dark);
+    max-width: 480px;
+    opacity: 0;
+    animation: fade-up 0.6s ease 0.85s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: var(--spacing-md);
+    opacity: 0;
+    animation: fade-up 0.6s ease 1s forwards;
+  }
+
+  @keyframes fade-up {
+    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(12px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-word {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .hero-line {
+      width: 100%;
+      animation: none;
+    }
+    .hero-sub,
+    .hero-actions {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  /* ─── Sections ───────────────────────────────────────────── */
+  .section-alt { background: #fafafa; }
+  .section-footer { margin-top: var(--spacing-md); }
+
+  /* ─── Newsletter ─────────────────────────────────────────── */
+  .newsletter-section { background: var(--color-brand-teal); color: var(--color-white); }
+  .newsletter-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
+  .newsletter-inner h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .newsletter-inner p { color: var(--color-gray-light); }
+
+  .newsletter-form { display: flex; gap: 0; flex-shrink: 0; align-items: flex-end; }
+
+  /* Animated underline input */
+  .input-wrap { position: relative; }
+  .input-wrap input {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: var(--color-white);
+    font-size: 0.875rem;
+    min-width: 260px;
+    outline: none;
+    display: block;
+  }
+  .input-wrap input::placeholder { color: var(--color-gray-light); }
+
+  .input-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+  .input-wrap input:focus + .input-line {
+    transform: scaleX(1);
+  }
+
+  .newsletter-form .btn {
+    border-color: var(--color-white);
+    background: var(--color-white);
+    color: var(--color-black);
+  }
+  .newsletter-form .btn:hover { background: var(--color-gray-light); }
+
+  @media (max-width: 768px) {
+    .newsletter-inner { flex-direction: column; align-items: flex-start; }
+    .newsletter-form { flex-direction: column; width: 100%; }
+    .input-wrap { width: 100%; }
+    .input-wrap input { min-width: unset; width: 100%; }
+  }
+</style>

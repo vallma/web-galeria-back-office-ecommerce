@@ -1,0 +1,50 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ExhibitionCard from '../../components/ExhibitionCard.astro';
+import { getArtistes, getArtistaBySlug } from '../../lib/sanity';
+import { toHTML } from '@portabletext/to-html';
+
+export async function getStaticPaths() {
+  const artistes = await getArtistes();
+  return artistes.map(a => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const artista = await getArtistaBySlug(slug);
+if (!artista) return Astro.redirect('/artistes');
+---
+
+<Layout title={artista.nom} description={`Artista de l'Espai Barri Vell — ${artista.nom}`}>
+  <section class="section">
+    <div class="container artista-layout">
+      <div class="artista-header">
+        {artista.foto && <img src={artista.foto} alt={artista.nom} class="artista-foto" />}
+        <div>
+          <p class="breadcrumb"><a href="/artistes">Artistes</a> / {artista.nom}</p>
+          <h1>{artista.nom}</h1>
+          {artista.bio && <div class="prose" set:html={toHTML(artista.bio)} />}
+        </div>
+      </div>
+      {artista.exposicions?.length > 0 && (
+        <div class="artista-exposicions">
+          <h2 class="section-title">Exposicions</h2>
+          <div class="grid-3">
+            {artista.exposicions.map(exp => <ExhibitionCard {...exp} />)}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .artista-layout { max-width: 900px; }
+  .artista-header { display: grid; grid-template-columns: 280px 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+  .artista-foto { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 1rem; }
+  .breadcrumb a { color: var(--color-gray-dark); }
+  h1 { margin-bottom: var(--spacing-sm); }
+  .prose { font-size: 1rem; line-height: 1.8; color: var(--color-gray-dark); }
+  .prose p { margin-bottom: 1em; }
+  @media (max-width: 768px) { .artista-header { grid-template-columns: 1fr; } }
+</style>

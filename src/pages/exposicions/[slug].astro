@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getExposicions, getExposicioBySlug } from '../../lib/sanity';
+import { toHTML } from '@portabletext/to-html';
+
+export async function getStaticPaths() {
+  const exps = await getExposicions();
+  return exps.map(e => ({ params: { slug: e.slug } }));
+}
+
+const { slug } = Astro.params;
+const exp = await getExposicioBySlug(slug);
+if (!exp) return Astro.redirect('/exposicions');
+
+const formatDate = (d: string) => new Date(d).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Layout title={exp.titol} description={exp.descripcio?.[0]?.children?.[0]?.text ?? ''} image={exp.imatgePrincipal}>
+  <article class="section">
+    <div class="container">
+      <p class="breadcrumb"><a href="/exposicions">Exposicions</a> / {exp.titol}</p>
+      {exp.imatgePrincipal && <img src={exp.imatgePrincipal} alt={exp.titol} class="hero-image" />}
+      <div class="exp-layout">
+        <div class="exp-content">
+          <h1>{exp.titol}</h1>
+          <p class="exp-dates">{formatDate(exp.dataInici)}{exp.dataFi && ` — ${formatDate(exp.dataFi)}`}</p>
+          {exp.descripcio && <div class="prose" set:html={toHTML(exp.descripcio)} />}
+        </div>
+        {exp.artistes?.length > 0 && (
+          <aside class="exp-sidebar">
+            <h3>Artistes</h3>
+            <ul class="artistes-list">
+              {exp.artistes.map(a => (
+                <li>
+                  <a href={`/artistes/${a.slug}`}>
+                    {a.foto && <img src={a.foto} alt={a.nom} />}
+                    <span>{a.nom}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+      </div>
+      {exp.imatges?.length > 1 && (
+        <div class="exp-gallery grid-3">
+          {exp.imatges.slice(1).map((url: string) => (
+            <img src={url} alt={exp.titol} loading="lazy" />
+          ))}
+        </div>
+      )}
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 1.5rem; }
+  .breadcrumb a { color: var(--color-gray-dark); }
+  .hero-image { width: 100%; max-height: 500px; object-fit: cover; margin-bottom: var(--spacing-md); }
+  .exp-layout { display: grid; grid-template-columns: 1fr 280px; gap: var(--spacing-lg); }
+  h1 { margin-bottom: 0.75rem; }
+  .exp-dates { font-size: 0.875rem; color: var(--color-gray-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--spacing-sm); }
+  .prose { font-size: 1rem; line-height: 1.8; color: var(--color-gray-dark); }
+  .prose p { margin-bottom: 1em; }
+  .exp-sidebar h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray-light); margin-bottom: 1rem; }
+  .artistes-list { list-style: none; }
+  .artistes-list li { margin-bottom: 0.75rem; }
+  .artistes-list a { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
+  .artistes-list img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  .exp-gallery { margin-top: var(--spacing-lg); }
+  .exp-gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+  @media (max-width: 768px) { .exp-layout { grid-template-columns: 1fr; } }
+</style>

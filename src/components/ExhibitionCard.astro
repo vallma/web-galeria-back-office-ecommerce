@@ -1,0 +1,90 @@
+---
+interface Props {
+  titol: string;
+  slug: string;
+  dataInici: string;
+  dataFi?: string;
+  imatgePrincipal?: string;
+  descripcioBreve?: string;
+}
+const { titol, slug, dataInici, dataFi, imatgePrincipal, descripcioBreve } = Astro.props;
+const formatDate = (d: string) => new Date(d).toLocaleDateString('ca-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<article class="exhibition-card reveal">
+  <a href={`/exposicions/${slug}`}>
+    {imatgePrincipal && (
+      <div class="card-image">
+        <img src={imatgePrincipal} alt={titol} loading="lazy" />
+        <div class="card-overlay" aria-hidden="true">
+          <span class="overlay-title">{titol}</span>
+        </div>
+      </div>
+    )}
+    <div class="card-body">
+      <p class="card-dates">
+        {formatDate(dataInici)}{dataFi && ` — ${formatDate(dataFi)}`}
+      </p>
+      <h3>{titol}</h3>
+      {descripcioBreve && <p class="card-desc">{descripcioBreve}</p>}
+    </div>
+  </a>
+</article>
+
+<style>
+  .exhibition-card { border: 1px solid var(--color-border); transition: border-color 0.2s; }
+  .exhibition-card:hover { border-color: var(--color-black); }
+  .exhibition-card a { display: block; text-decoration: none; }
+
+  .card-image {
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    position: relative;
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    display: block;
+  }
+  .exhibition-card:hover .card-image img { transform: scale(1.04); }
+
+  /* Overlay */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.25rem;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .exhibition-card:hover .card-overlay {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .overlay-title {
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-image img { transition: none; }
+    .card-overlay { transition: none; }
+  }
+
+  .card-body { padding: 1.25rem; }
+  .card-dates {
+    font-size: 0.75rem;
+    color: var(--color-gray-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .card-body h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .card-desc { font-size: 0.875rem; color: var(--color-gray-dark); }
+</style>

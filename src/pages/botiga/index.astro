@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArtworkCard from '../../components/ArtworkCard.astro';
+import { getObres } from '../../lib/sanity';
+
+const obres = await getObres();
+---
+
+<Layout title="Botiga" description="Adquireix obra original dels artistes de l'Espai Barri Vell">
+  <section class="section">
+    <div class="container">
+      <h1 class="section-title">Botiga</h1>
+      {obres.length === 0
+        ? <p class="empty">Ara mateix no hi ha obres disponibles. Torna aviat!</p>
+        : (
+          <div class="grid-4">
+            {obres.map(obra => <ArtworkCard {...obra} />)}
+          </div>
+        )
+      }
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .empty { color: var(--color-gray-dark); font-size: 1rem; padding: var(--spacing-lg) 0; }
+</style>

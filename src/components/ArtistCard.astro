@@ -1,0 +1,80 @@
+---
+interface Props {
+  nom: string;
+  slug: string;
+  bioBreu?: string;
+  foto?: string;
+}
+const { nom, slug, bioBreu, foto } = Astro.props;
+---
+<article class="artist-card reveal">
+  <a href={`/artistes/${slug}`}>
+    <div class="card-image">
+      {foto
+        ? <img src={foto} alt={nom} loading="lazy" />
+        : <div class="no-image"></div>
+      }
+      <div class="card-overlay" aria-hidden="true">
+        <span class="overlay-title">{nom}</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>{nom}</h3>
+      {bioBreu && <p>{bioBreu}</p>}
+    </div>
+  </a>
+</article>
+
+<style>
+  .artist-card { border: 1px solid var(--color-border); transition: border-color 0.2s; }
+  .artist-card:hover { border-color: var(--color-black); }
+  .artist-card a { display: block; text-decoration: none; }
+
+  .card-image {
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    background: #f5f5f5;
+    position: relative;
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    display: block;
+  }
+  .artist-card:hover .card-image img { transform: scale(1.04); }
+
+  /* Overlay */
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.25rem;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .artist-card:hover .card-overlay {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .overlay-title {
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-image img { transition: none; }
+    .card-overlay { transition: none; }
+  }
+
+  .no-image { width: 100%; height: 100%; background: #eee; }
+  .card-body { padding: 1.25rem; }
+  .card-body h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .card-body p { font-size: 0.875rem; color: var(--color-gray-dark); }
+</style>
