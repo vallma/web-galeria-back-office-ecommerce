@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Gràcies per la teva compra" description="Compra completada — Espai Barri Vell">
+  <section class="section">
+    <div class="container thanks">
+      <h1>Gràcies per la teva compra</h1>
+      <p>El pagament s'ha completat correctament. Ens posarem en contacte amb tu ben aviat per coordinar l'enviament de l'obra.</p>
+      <p>Si tens qualsevol dubte, escriu-nos des de la pàgina de <a href="/contacte">contacte</a>.</p>
+      <a href="/botiga" class="btn btn-primary">Tornar a la botiga</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .thanks { max-width: 560px; text-align: center; }
+  h1 { margin-bottom: var(--spacing-sm); }
+  p { margin-bottom: 1rem; color: var(--color-gray-dark); line-height: 1.6; }
+  .btn { margin-top: 1rem; display: inline-block; }
+</style>

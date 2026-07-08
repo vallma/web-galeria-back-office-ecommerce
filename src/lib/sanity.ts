@@ -80,7 +80,7 @@ export async function getObres() {
 export async function getObraBySlug(slug: string) {
   return safeFetch(`
     *[_type == "obra" && slug.current == $slug][0] {
-      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold, stripeProductId,
+      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold,
       "imatges": imatges[].asset->url,
       artista->{ nom, "slug": slug.current, "foto": foto.asset->url }
     }

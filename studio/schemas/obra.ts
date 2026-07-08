@@ -14,7 +14,6 @@ export const obra = defineType({
     defineField({ name: 'preu', title: 'Preu (€)', type: 'number', validation: r => r.required().positive() }),
     defineField({ name: 'imatges', title: 'Imatges', type: 'array', of: [{ type: 'image', options: { hotspot: true } }], validation: r => r.required().min(1) }),
     defineField({ name: 'sold', title: 'Venuda', type: 'boolean', initialValue: false }),
-    defineField({ name: 'stripeProductId', title: 'Stripe Price ID', type: 'string', description: 'price_xxx de Stripe (afegir un cop creada a Stripe)' }),
   ],
   preview: {
     select: { title: 'titol', subtitle: 'artista.nom', media: 'imatges.0', sold: 'sold' },

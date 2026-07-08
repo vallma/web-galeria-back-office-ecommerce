@@ -9,16 +9,18 @@ Reconstrucció completa de [espaibarrivell.com](https://espaibarrivell.com) en c
 │  Astro (SSG)    │ ◄──────────────────── │  Sanity Studio   │
 │  HTML estàtic   │                        │  Back office CMS │
 └────────┬────────┘                        └──────────────────┘
-         │ Stripe Checkout (hosted)
+         │ POST /api/redsys-checkout (formulari signat)
          ▼
-┌─────────────────┐   checkout.session.completed   ┌──────────────────┐
-│  Stripe         │ ──────────────────────────────► │  Webhook Vercel  │
-│  Pagaments      │                                 │  Marca obra venuda│
+┌─────────────────┐   notificació online (HMAC)    ┌──────────────────┐
+│  Redsys (BBVA)  │ ──────────────────────────────► │  Webhook Vercel  │
+│  TPV Virtual    │                                 │  Marca obra venuda│
 └─────────────────┘                                 └──────────────────┘
 ```
 
 **Per què aquest stack?**
-El hosting del client és compartit (sense Node.js/SSR). La solució: Astro en mode estàtic + Stripe Checkout hosted (sense backend propi) + una única funció serverless a Vercel per al webhook.
+El hosting del client és compartit (sense Node.js/SSR). La solució: Astro en mode estàtic + TPV Virtual de BBVA (Redsys, redirecció hosted) + dues funcions serverless a Vercel: `redsys-checkout` (signa i inicia el pagament) i `redsys-notification` (verifica la firma i marca l'obra com a venuda).
+
+**Variables d'entorn Redsys** (al projecte Vercel del webhook): `REDSYS_MERCHANT_CODE`, `REDSYS_TERMINAL`, `REDSYS_SECRET_KEY` (clau SHA-256 de Canales Redsys), `REDSYS_ENVIRONMENT` (`live` o `test`), `SITE_URL`, `SANITY_PROJECT_ID`, `SANITY_DATASET`, `SANITY_API_TOKEN`, `DEPLOY_HOOK_URL`.
 
 ---
 
@@ -30,8 +32,7 @@ El hosting del client és compartit (sense Node.js/SSR). La solució: Astro en m
 │   ├── components/         # Components reutilitzables
 │   ├── layouts/            # Layout base (HTML, CSS global, scripts)
 │   ├── lib/
-│   │   ├── sanity.ts       # Client Sanity + queries GROQ
-│   │   └── stripe.ts       # Client Stripe
+│   │   └── sanity.ts       # Client Sanity + queries GROQ
 │   └── pages/              # Pàgines (file-based routing)
 │       ├── index.astro
 │       ├── espai.astro
@@ -45,13 +46,14 @@ El hosting del client és compartit (sense Node.js/SSR). La solució: Astro en m
 │   └── schemas/            # Esquemes de contingut
 │       ├── artista.ts
 │       ├── exposicio.ts
-│       ├── obra.ts         # Artwork — inclou camp `sold` i `stripeProductId`
+│       ├── obra.ts         # Artwork — inclou camp `sold`
 │       ├── post.ts
 │       └── paginaEspai.ts
 │
-├── webhook/                # Funció serverless (deploy a Vercel)
-│   └── api/
-│       └── stripe-webhook.ts   # Escolta Stripe → marca obra.sold = true
+├── api/                    # Funcions serverless Redsys (mateix projecte Vercel)
+│   ├── _lib/redsys.ts      # Firma HMAC_SHA256_V1 del TPV
+│   ├── redsys-checkout.ts  # Signa i inicia el pagament al TPV
+│   └── redsys-notification.ts  # Verifica la firma → marca obra.sold = true
 │
 └── env.example             # Variables d'entorn necessàries
 ```
@@ -95,32 +97,32 @@ El client gestiona tot el contingut des de Sanity Studio sense tocar codi.
 | `artista` | nom, bio, foto, slug |
 | `exposicio` | titol, descripcio, dates, artistes[], imatges[], slug |
 | `post` | titol, cos (Portable Text), data, imatgePrincipal, slug |
-| `obra` | titol, artista (ref), preu, dimensions, tecnica, any, imatges[], **sold**, **stripeProductId**, slug |
+| `obra` | titol, artista (ref), preu, dimensions, tecnica, any, imatges[], **sold**, slug |
 | `paginaEspai` | titol, cos, imatges[] — singleton |
 
 El Sanity Studio es desplega gratuïtament a `sanity.studio`.
 
 ---
 
-### Fase 3 — Botiga i pagaments (Stripe) ✅
+### Fase 3 — Botiga i pagaments (TPV BBVA / Redsys) ✅
 Obres originals amb stock = 1. Quan es ven, desapareix del catàleg.
 
 **Flux de compra:**
 1. L'usuari fa clic a "Adquirir obra" a `/botiga/[slug]`
-2. El formulari fa POST a `/api/checkout`
-3. Es crea una sessió de Stripe Checkout hosted
-4. Stripe redirigeix l'usuari a la pàgina de pagament (hosted per Stripe, sense PCI)
-5. Quan es completa el pagament, Stripe crida el webhook
+2. El formulari fa POST a `/api/redsys-checkout`
+3. La funció busca el preu a Sanity, signa els paràmetres (HMAC_SHA256_V1) i retorna un formulari auto-enviat cap a `sis.redsys.es`
+4. Redsys mostra la pàgina de pagament segura (3-D Secure, sense PCI al nostre costat)
+5. Si el pagament és correcte, l'usuari torna a `/botiga/gracies`; si falla, a l'obra amb `?pagament=ko`
 
 ---
 
-### Fase 4 — Webhook (Vercel Serverless) ✅
-Una sola funció a Vercel free tier. No requereix cap altre backend.
+### Fase 4 — Notificació online (Vercel Serverless) ✅
+Redsys envia la notificació servidor-a-servidor independentment del navegador de l'usuari.
 
-**Flux del webhook:**
-1. Stripe envia `checkout.session.completed` al endpoint `/api/stripe-webhook`
-2. El webhook verifica la signatura (`STRIPE_WEBHOOK_SECRET`)
-3. Llegeix `session.metadata.obraId`
+**Flux de la notificació:**
+1. Redsys fa POST a `/api/redsys-notification` amb `Ds_MerchantParameters` i `Ds_Signature`
+2. La funció verifica la firma HMAC amb la clau SHA-256 del comerç
+3. Si `Ds_Response` està entre 0000 i 0099, llegeix `Ds_MerchantData` (obraId)
 4. Fa `sanity.patch(obraId).set({ sold: true }).commit()`
 5. Opcionalment dispara un redeploy d'Astro via `DEPLOY_HOOK_URL`
 
@@ -131,8 +133,8 @@ Una sola funció a Vercel free tier. No requereix cap altre backend.
 ### Requisits
 - Node.js 18+
 - Compte a [Sanity](https://sanity.io) (free tier)
-- Compte a [Stripe](https://stripe.com)
-- Compte a [Vercel](https://vercel.com) (per al webhook)
+- TPV Virtual de BBVA (Redsys) — comerç donat d'alta a [Canales Redsys](https://canales.redsys.es)
+- Compte a [Vercel](https://vercel.com) (per a les funcions de pagament)
 
 ### Variables d'entorn
 
@@ -141,10 +143,13 @@ Copia `env.example` a `.env` i omple els valors:
 ```env
 PUBLIC_SANITY_PROJECT_ID=   # ID del projecte Sanity
 PUBLIC_SANITY_DATASET=production
-STRIPE_SECRET_KEY=          # sk_live_... o sk_test_...
-PUBLIC_STRIPE_PUBLISHABLE_KEY=  # pk_live_... o pk_test_...
-STRIPE_WEBHOOK_SECRET=      # whsec_... (des del dashboard de Stripe)
-SANITY_API_TOKEN=           # Token amb permisos d'escriptura (per al webhook)
+SANITY_API_TOKEN=           # Token amb permisos d'escriptura (per a la notificació)
+REDSYS_MERCHANT_CODE=       # FUC del comerç (p. ex. 368392221)
+REDSYS_TERMINAL=1
+REDSYS_SECRET_KEY=          # Clau SHA-256 de Canales Redsys
+REDSYS_ENVIRONMENT=live     # 'live' o 'test' (sis-t.redsys.es)
+SITE_URL=https://espaibarrivell.com
+PUBLIC_PAYMENTS_BASE_URL=   # URL del projecte Vercel si la web es serveix en un altre hosting
 ```
 
 ### Instal·lació i dev
@@ -159,37 +164,4 @@ cd studio
 npm install
 npm run dev          # http://localhost:3333
 
-# Webhook (dev local amb Stripe CLI)
-stripe listen --forward-to localhost:3000/api/stripe-webhook
-```
-
-### Build i deploy
-
-```bash
-# Frontend → HTML estàtic
-npm run build        # genera /dist → pujar al hosting compartit
-
-# Sanity Studio → sanity deploy (o sanity.studio)
-
-# Webhook → git push a Vercel (detecta /webhook/vercel.json automàticament)
-```
-
----
-
-## Deploy
-
-| Part | On | Com |
-|------|-----|-----|
-| Frontend | Hosting compartit del client | Pujar `/dist` per FTP o el mètode del hosting |
-| Sanity Studio | sanity.studio (gratis) | `cd studio && npx sanity deploy` |
-| Webhook | Vercel free tier | Connectar el repo, arrel = `/webhook` |
-
----
-
-## Tecnologies
-
-- [Astro](https://astro.build) — SSG, zero JS per defecte
-- [Sanity](https://sanity.io) — CMS headless + Studio
-- [Stripe](https://stripe.com) — Pagaments hosted (sense backend propi)
-- [Vercel](https://vercel.com) — Serverless function per al webhook
-- TypeScript
+# Funcions de pagame
