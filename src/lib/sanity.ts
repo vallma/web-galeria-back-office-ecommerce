@@ -111,3 +111,26 @@ export async function getPaginaEspai() {
     titol, cos, "imatges": imatges[].asset->url
   }`, {}, null);
 }
+
+// Exposició per al hero de la home: la que està en curs avui;
+// si no n'hi ha cap, la propera; i si tampoc, la més recent.
+export async function getExposicioHero() {
+  const res = await safeFetch<{ actual: unknown; propera: unknown; ultima: unknown } | null>(`{
+    "actual": *[_type == "exposicio" && dataInici <= now() && (!defined(dataFi) || dataFi >= now())] | order(dataInici desc)[0]{
+      _id, titol, "slug": slug.current, dataInici, dataFi,
+      artistes[]->{ nom },
+      "portada": coalesce(portada.asset->url, imatgePrincipal.asset->url)
+    },
+    "propera": *[_type == "exposicio" && dataInici > now()] | order(dataInici asc)[0]{
+      _id, titol, "slug": slug.current, dataInici, dataFi,
+      artistes[]->{ nom },
+      "portada": coalesce(portada.asset->url, imatgePrincipal.asset->url)
+    },
+    "ultima": *[_type == "exposicio"] | order(dataInici desc)[0]{
+      _id, titol, "slug": slug.current, dataInici, dataFi,
+      artistes[]->{ nom },
+      "portada": coalesce(portada.asset->url, imatgePrincipal.asset->url)
+    }
+  }`, undefined, null);
+  return res?.actual ?? res?.propera ?? res?.ultima ?? null;
+}

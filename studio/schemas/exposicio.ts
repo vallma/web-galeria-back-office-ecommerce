@@ -12,6 +12,13 @@ export const exposicio = defineType({
     defineField({ name: 'descripcioBreve', title: 'Descripció breu', type: 'text', rows: 2 }),
     defineField({ name: 'descripcio', title: 'Descripció completa', type: 'array', of: [{ type: 'block' }] }),
     defineField({ name: 'imatgePrincipal', title: 'Imatge principal', type: 'image', options: { hotspot: true } }),
+    defineField({
+      name: 'portada',
+      title: 'Portada (hero de la home)',
+      type: 'image',
+      options: { hotspot: true },
+      description: "Imatge que es mostra al hero de la home mentre l'exposició està en curs. Si es deixa buida, s'usa la imatge principal.",
+    }),
     defineField({ name: 'imatges', title: "Galeria d'imatges", type: 'array', of: [{ type: 'image', options: { hotspot: true } }] }),
     defineField({ name: 'artistes', title: 'Artistes', type: 'array', of: [{ type: 'reference', to: [{ type: 'artista' }] }] }),
   ],

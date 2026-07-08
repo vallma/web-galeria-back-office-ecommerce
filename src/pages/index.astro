@@ -1,11 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import BlogCard from '../components/BlogCard.astro';
-import { getExposicions, getPosts } from '../lib/sanity';
+import { getExposicioHero, getPosts } from '../lib/sanity';
 
-const exposicions = await getExposicions();
+const expo = await getExposicioHero();
 const posts = await getPosts();
-const expo = exposicions[0];
 const postsRecents = posts.slice(0, 8);
 
 // "09/04 - 30/05, 2026" a partir de dataInici/dataFi
@@ -31,8 +30,8 @@ const nomArtista = expo?.artistes?.map((a: { nom: string }) => a.nom).join(' · 
         </div>
       </a>
       <a class="hero-right" href={`/exposicions/${expo.slug}`} aria-label={expo.titol}>
-        {expo.imatgePrincipal
-          ? <img src={expo.imatgePrincipal} alt={expo.titol} loading="eager" />
+        {expo.portada
+          ? <img src={expo.portada} alt={expo.titol} loading="eager" />
           : <div class="hero-noimage"></div>
         }
       </a>
