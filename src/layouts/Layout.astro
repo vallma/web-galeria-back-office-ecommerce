@@ -24,9 +24,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:title" content={`${title} — Espai Barri Vell`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+    <link rel="preload" href="/fonts/ChampagneLimousines-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/FuturaLTPro-Book.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/FuturaLTPro-Heavy.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <Nav />
@@ -38,23 +38,73 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 </html>
 
 <style is:global>
+  /* ── Fonts corporatives (GuideEBV), servides en local ── */
+  @font-face {
+    font-family: 'Champagne & Limousines';
+    src: url('/fonts/ChampagneLimousines-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Champagne & Limousines';
+    src: url('/fonts/ChampagneLimousines-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Futura LT Pro';
+    src: url('/fonts/FuturaLTPro-Book.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Futura LT Pro';
+    src: url('/fonts/FuturaLTPro-BookOblique.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Futura LT Pro';
+    src: url('/fonts/FuturaLTPro-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Futura LT Pro';
+    src: url('/fonts/FuturaLTPro-Heavy.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
-    --color-black: #000000;
-    --color-white: #ffffff;
+    /* ── Paleta corporativa (GuideEBV) ────────────── */
+    --color-ink:   #161616;
+    --color-paper: #FFFFFF;
+    --color-cream: #F6F3EC;
+    --color-black: var(--color-ink);
+    --color-white: var(--color-paper);
     --color-gray-dark: #606060;
     --color-gray-light: #a3a3a3;
-    --color-border: rgba(0, 0, 0, 0.10);
+    --color-border: rgba(22, 22, 22, 0.10);
 
-    /* ── Brand palette (from logo) ────────────────── */
-    --color-brand-blue:   #72C4E0;
-    --color-brand-orange: #F4872A;
-    --color-brand-red:    #D64045;
-    --color-brand-teal:   #4E8F85;
-    --color-brand-yellow: #F5C225;
-    --color-accent:       #4E8F85; /* primary accent = teal */
+    --color-brand-blue:   #5EBCEC; /* text negre */
+    --color-brand-orange: #E36F00; /* text negre */
+    --color-brand-red:    #C82A3E; /* text blanc */
+    --color-brand-teal:   #3F7E7B; /* text blanc */
+    --color-brand-yellow: #F0C030; /* text negre */
+    --color-accent:       var(--color-brand-teal);
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    /* ── Tipografies corporatives (GuideEBV) ──────── */
+    /* H1: Champagne & Limousines Bold · H2/H3: Futura LT Pro Heavy · Text: Futura LT Pro Book */
+    --font-heading: 'Champagne & Limousines', 'Futura', 'Century Gothic', sans-serif;
+    --font-sans: 'Futura LT Pro', 'Futura', 'Century Gothic', sans-serif;
+    --font-serif: var(--font-heading);
     --container-max: 1200px;
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
@@ -69,8 +119,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
   body {
     font-family: var(--font-sans);
-    color: var(--color-black);
-    background: var(--color-white);
+    font-size: 0.875rem; /* GuideEBV: text 12px; 14px per llegibilitat web */
+    color: var(--color-ink);
+    background: var(--color-paper);
     line-height: 1.6;
   }
 
@@ -86,15 +137,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     padding: 0 var(--spacing-md);
   }
 
-  h1, h2, h3, h4 { font-family: var(--font-serif); font-weight: 600; line-height: 1.2; }
-  h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 400; }
-  h2 { font-size: clamp(1.8rem, 3.5vw, 3rem); font-weight: 400; }
-  h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
+  /* Jerarquia tipogràfica GuideEBV: H1 32px bold · H2 24px heavy · H3 20px heavy */
+  h1 { font-family: var(--font-heading); font-weight: 700; font-size: clamp(1.75rem, 3vw, 2rem); line-height: 1.2; }
+  h2 { font-family: var(--font-sans); font-weight: 800; font-size: 1.5rem; line-height: 1.2; }
+  h3 { font-family: var(--font-sans); font-weight: 800; font-size: 1.25rem; line-height: 1.2; }
+  h4 { font-family: var(--font-sans); font-weight: 800; line-height: 1.2; }
 
   .section { padding: var(--spacing-xl) 0; }
   .section-title {
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
-    font-weight: 400;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--color-border);
@@ -115,9 +168,28 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     letter-spacing: 0.05em;
     will-change: transform;
   }
-  .btn:hover { background: var(--color-black); color: var(--color-white); text-decoration: none; }
-  .btn-primary { background: var(--color-black); color: var(--color-white); }
+  .btn:hover { background: var(--color-ink); color: var(--color-paper); text-decoration: none; }
+  .btn-primary { background: var(--color-ink); color: var(--color-paper); }
   .btn-primary:hover { background: var(--color-gray-dark); }
+
+  /* ─── Etiquetes (GuideEBV: categories, filtratge botiga, blog) ── */
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-sans);
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .tag-red    { background: var(--color-brand-red);    color: var(--color-paper); }
+  .tag-teal   { background: var(--color-brand-teal);   color: var(--color-paper); }
+  .tag-blue   { background: var(--color-brand-blue);   color: var(--color-ink); }
+  .tag-yellow { background: var(--color-brand-yellow); color: var(--color-ink); }
+  .tag-orange { background: var(--color-brand-orange); color: var(--color-ink); }
+  .tag-outline { background: var(--color-paper); color: var(--color-ink); border: 1px solid var(--color-ink); }
 
   .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
@@ -281,7 +353,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     });
   })();
 
-  /* ─── Card tilt ──────────────────────────────────────────── */
+  /* ─── Card tilt (efecte 3D subtil) ───────────────────────── */
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
