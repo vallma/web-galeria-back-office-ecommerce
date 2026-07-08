@@ -70,7 +70,7 @@ export async function getArtistaBySlug(slug: string) {
 export async function getObres() {
   return safeFetch(`
     *[_type == "obra" && sold != true] | order(_createdAt desc) {
-      _id, titol, "slug": slug.current, preu, dimensions, tecnica, sold,
+      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold,
       "imatgePrincipal": imatges[0].asset->url,
       artista->{ nom, "slug": slug.current }
     }
