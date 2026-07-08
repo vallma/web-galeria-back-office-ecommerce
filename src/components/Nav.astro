@@ -16,6 +16,7 @@ const currentPath = Astro.url.pathname;
   <div class="container header-inner">
     <a href="/" class="logo" aria-label="Espai Barri Vell — Inici">
       <Logo showText={false} />
+      <span class="logo-wordmark">Espai Barri Vell</span>
     </a>
     <nav class="main-nav" aria-label="Navegació principal">
       <ul>
@@ -94,10 +95,26 @@ const currentPath = Astro.url.pathname;
     opacity: 0;
     animation: logo-fade 0.6s ease 0.1s forwards;
   }
+  .logo {
+    gap: 0.65rem;
+  }
   .logo :global(svg) {
     height: 44px;
     width: auto;
     display: block;
+  }
+  .logo-wordmark {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+  .logo:hover { text-decoration: none; }
+  @media (max-width: 380px) {
+    .logo-wordmark { font-size: 0.85rem; }
   }
 
   @keyframes logo-fade {
@@ -186,20 +203,4 @@ const currentPath = Astro.url.pathname;
     opacity: 1;
     visibility: visible;
     border-top-color: var(--color-border);
-    transition: max-height 0.4s ease, opacity 0.3s ease, border-color 0.3s ease, visibility 0s linear 0s;
-  }
-  .mobile-menu ul { list-style: none; padding: 1rem 0; }
-  .mobile-nav-link {
-    display: block;
-    padding: 0.75rem var(--spacing-md);
-    font-size: 1rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  @media (max-width: 768px) {
-    .main-nav { display: none; }
-    .burger { display: flex; }
-  }
-</style>
+    transition: max-height 0.4s ea
