@@ -31,6 +31,7 @@ export async function getExposicions() {
   return safeFetch(`
     *[_type == "exposicio"] | order(dataInici desc) {
       _id, titol, "slug": slug.current, dataInici, dataFi, descripcioBreve,
+      artistes[]->{ nom },
       "imatgePrincipal": imatgePrincipal.asset->url
     }
   `);

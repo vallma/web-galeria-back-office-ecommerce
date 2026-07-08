@@ -1,77 +1,125 @@
 ---
+import Logo from './Logo.astro';
 const currentYear = new Date().getFullYear();
+
+const navItems = [
+  { href: '/artistes', label: 'Artistes' },
+  { href: '/exposicions', label: 'Exposicions' },
+  { href: '/botiga', label: 'Botiga' },
+  { href: '/blog', label: 'Notícies' },
+  { href: '/espai', label: 'Espai' },
+  { href: '/contacte', label: 'Contacte' },
+];
+const legalItems = [
+  { href: '/avis-legal', label: 'Condicions generals' },
+  { href: '/politica-privacitat', label: 'Política de privacitat' },
+  { href: '/cookies', label: 'Cookies' },
+];
 ---
 <footer class="site-footer">
-  <div class="container footer-inner">
+  <div class="container footer-grid">
+    <!-- Marca + newsletter (wireframe) -->
     <div class="footer-brand">
-      <p class="footer-logo">EBV</p>
-      <p class="footer-tagline">Espai d'art al cor de Girona</p>
+      <div class="footer-logo"><Logo showText={true} /></div>
+      <p class="footer-news-text">Uneix-te a la nostra comunitat i subscriu-te al butlletí per estar al dia de totes les novetats.</p>
+      <form class="footer-form" action="#" method="post">
+        <input type="email" name="email" placeholder="El teu correu electrònic" required aria-label="Correu electrònic" />
+        <button type="submit" class="footer-sub">Subscriu-te</button>
+      </form>
     </div>
-    <nav class="footer-nav">
-      <div class="footer-col">
-        <h3>Espai</h3>
-        <ul>
-          <li><a href="/espai">Qui som</a></li>
-          <li><a href="/exposicions">Exposicions</a></li>
-          <li><a href="/artistes">Artistes</a></li>
-          <li><a href="/blog">Blog</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h3>Botiga</h3>
-        <ul>
-          <li><a href="/botiga">Totes les obres</a></li>
-          <li><a href="/contacte">Contacte</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h3>Contacte</h3>
-        <address>
-          <p>Plaça dels Lledoners, 1</p>
-          <p>17004 Girona</p>
-          <p><a href="tel:+34648869034">+34 648 869 034</a></p>
-          <p><a href="mailto:espaibarrivell@gmail.com">espaibarrivell@gmail.com</a></p>
-        </address>
-        <div class="footer-hours">
-          <p>Dim–Div: 10–13h, 15–18h</p>
-          <p>Dis: 11–19h</p>
-          <p>Diu–Dil: tancat</p>
-        </div>
-      </div>
+
+    <!-- Adreça i horaris -->
+    <div class="footer-info">
+      <p><strong>Adreça</strong> Plaça dels Lledoners, 1, 17004 Girona</p>
+      <p><strong>Horaris</strong> Dimarts – Divendres: 10–13h i 15–19h</p>
+      <p>Dissabtes 11–19h · Tancat diumenges i dilluns</p>
+      <p><a href="tel:+34648869034">+34 648 869 034</a> · <a href="mailto:espaibarrivell@gmail.com">espaibarrivell@gmail.com</a></p>
+    </div>
+
+    <!-- Navegació -->
+    <nav class="footer-col" aria-label="Navegació del peu">
+      <ul>
+        {navItems.map(item => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <!-- Legal -->
+    <nav class="footer-col" aria-label="Enllaços legals">
+      <ul>
+        {legalItems.map(item => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
     </nav>
   </div>
+
   <div class="footer-bottom container">
     <p>&copy; {currentYear} Espai Barri Vell. Tots els drets reservats.</p>
-    <ul class="footer-legal">
-      <li><a href="/avis-legal">Avís legal</a></li>
-      <li><a href="/politica-privacitat">Privacitat</a></li>
-      <li><a href="/cookies">Cookies</a></li>
-    </ul>
   </div>
 </footer>
 
 <style>
-  .site-footer { border-top: 1px solid var(--color-border); padding-top: var(--spacing-lg); }
-  .footer-inner { display: grid; grid-template-columns: 1fr 2fr; gap: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
-  .footer-logo { font-size: 1.5rem; font-weight: 700; }
-  .footer-tagline { color: var(--color-gray-dark); font-size: 0.875rem; margin-top: 0.5rem; }
-  .footer-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
-  .footer-col h3 { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-gray-light); margin-bottom: 1rem; }
+  /* Wireframe: footer sobre fons teal corporatiu */
+  .site-footer {
+    background: var(--color-brand-teal);
+    color: var(--color-paper);
+    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1.4fr 0.8fr 1fr;
+    gap: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    align-items: start;
+  }
+  .footer-logo :global(svg) { height: 96px; width: auto; }
+  .footer-news-text { font-size: 0.8rem; margin: 1rem 0 0.75rem; max-width: 280px; }
+  .footer-form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .footer-form input {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--color-paper);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    min-width: 190px;
+    outline: none;
+  }
+  .footer-sub {
+    background: var(--color-brand-orange);
+    color: var(--color-ink);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
+  .footer-sub:hover { filter: brightness(0.92); }
+
+  .footer-info { font-size: 0.85rem; line-height: 1.7; }
+  .footer-info p { margin-bottom: 0.4rem; }
+  .footer-info strong { font-weight: 800; }
+  .footer-info a { color: var(--color-paper); }
+
   .footer-col ul { list-style: none; }
-  .footer-col li { margin-bottom: 0.5rem; }
-  .footer-col a { font-size: 0.875rem; color: var(--color-gray-dark); }
-  .footer-col a:hover { color: var(--color-black); }
-  address { font-style: normal; font-size: 0.875rem; color: var(--color-gray-dark); }
-  address p { margin-bottom: 0.25rem; }
-  .footer-hours { margin-top: 0.75rem; font-size: 0.875rem; color: var(--color-gray-dark); }
-  .footer-hours p { margin-bottom: 0.2rem; }
-  .footer-bottom { border-top: 1px solid var(--color-border); padding: var(--spacing-md) 0; display: flex; justify-content: space-between; align-items: center; }
-  .footer-bottom p { font-size: 0.8rem; color: var(--color-gray-light); }
-  .footer-legal { display: flex; list-style: none; gap: 1.5rem; }
-  .footer-legal a { font-size: 0.8rem; color: var(--color-gray-light); }
-  @media (max-width: 768px) {
-    .footer-inner { grid-template-columns: 1fr; }
-    .footer-nav { grid-template-columns: 1fr 1fr; }
-    .footer-bottom { flex-direction: column; gap: 0.75rem; text-align: center; }
+  .footer-col li { margin-bottom: 0.45rem; }
+  .footer-col a { font-size: 0.85rem; color: var(--color-paper); }
+  .footer-col a:hover { text-decoration: underline; }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: center;
+  }
+  .footer-bottom p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); }
+
+  @media (max-width: 900px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .footer-grid { grid-template-columns: 1fr; }
   }
 </style>
