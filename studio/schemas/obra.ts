@@ -8,6 +8,21 @@ export const obra = defineType({
     defineField({ name: 'titol', title: 'Títol', type: 'string', validation: r => r.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'titol' }, validation: r => r.required() }),
     defineField({ name: 'artista', title: 'Artista', type: 'reference', to: [{ type: 'artista' }] }),
+    defineField({
+      name: 'categoria',
+      title: 'Categoria',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Quadres', value: 'quadres' },
+          { title: 'Escultures', value: 'escultures' },
+          { title: 'Edicions', value: 'edicions' },
+          { title: 'Petit objectes', value: 'petit-objectes' },
+          { title: 'Tallers', value: 'tallers' },
+        ],
+        layout: 'radio',
+      },
+    }),
     defineField({ name: 'any', title: 'Any', type: 'number' }),
     defineField({ name: 'tecnica', title: 'Tècnica', type: 'string' }),
     defineField({ name: 'dimensions', title: 'Dimensions', type: 'string', description: 'ex: 80 × 60 cm' }),

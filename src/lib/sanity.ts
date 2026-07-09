@@ -62,7 +62,12 @@ export async function getArtistaBySlug(slug: string) {
     *[_type == "artista" && slug.current == $slug][0] {
       _id, nom, "slug": slug.current, bio, "foto": foto.asset->url,
       "exposicions": *[_type == "exposicio" && references(^._id)] {
-        titol, "slug": slug.current, dataInici, dataFi
+        titol, "slug": slug.current, dataInici, dataFi,
+        "imatgePrincipal": imatgePrincipal.asset->url
+      },
+      "obres": *[_type == "obra" && references(^._id)] | order(_createdAt desc) {
+        titol, "slug": slug.current, sold,
+        "img": imatges[0].asset->url
       }
     }
   `, { slug }, null);
@@ -71,7 +76,7 @@ export async function getArtistaBySlug(slug: string) {
 export async function getObres() {
   return safeFetch(`
     *[_type == "obra" && sold != true] | order(_createdAt desc) {
-      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold,
+      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold, categoria,
       "imatgePrincipal": imatges[0].asset->url,
       artista->{ nom, "slug": slug.current }
     }
@@ -81,7 +86,7 @@ export async function getObres() {
 export async function getObraBySlug(slug: string) {
   return safeFetch(`
     *[_type == "obra" && slug.current == $slug][0] {
-      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold,
+      _id, titol, "slug": slug.current, preu, dimensions, tecnica, any, sold, categoria,
       "imatges": imatges[].asset->url,
       artista->{ nom, "slug": slug.current, "foto": foto.asset->url }
     }
@@ -91,7 +96,7 @@ export async function getObraBySlug(slug: string) {
 export async function getPosts() {
   return safeFetch(`
     *[_type == "post"] | order(dataPublicacio desc) {
-      _id, titol, "slug": slug.current, dataPublicacio, extracte,
+      _id, titol, "slug": slug.current, dataPublicacio, extracte, categoria,
       "imatgePrincipal": imatgePrincipal.asset->url
     }
   `);
@@ -108,7 +113,8 @@ export async function getPostBySlug(slug: string) {
 
 export async function getPaginaEspai() {
   return safeFetch(`*[_type == "paginaEspai"][0] {
-    titol, cos, "imatges": imatges[].asset->url
+    titol, cos, "imatges": imatges[].asset->url,
+    equip[]{ nom, carrec, "foto": foto.asset->url }
   }`, {}, null);
 }
 

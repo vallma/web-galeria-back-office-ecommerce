@@ -4,15 +4,99 @@ import BlogCard from '../../components/BlogCard.astro';
 import { getPosts } from '../../lib/sanity';
 
 const posts = await getPosts();
+const destacat = posts[0];
+const resta = posts.slice(1);
+const totes = [
+  { value: 'noticies', label: 'Notícies' },
+  { value: 'esdeveniments', label: 'Esdeveniments' },
+  { value: 'exposicions', label: 'Exposicions' },
+];
+const cats = totes.filter(c => posts.some((p: { categoria?: string }) => p.categoria === c.value));
 ---
 
-<Layout title="Blog">
+<Layout title="Notícies" description="Novetats, esdeveniments i actualitat de l'Espai Barri Vell">
   <section class="section">
     <div class="container">
-      <h1 class="section-title">Blog</h1>
-      <div class="grid-3">
-        {posts.map(post => <BlogCard {...post} />)}
+      {cats.length > 1 && (
+        <div class="filters reveal" role="group" aria-label="Filtra per categoria">
+          <button class="filter-btn active" data-cat="tot">Tot</button>
+          {cats.map(c => <button class="filter-btn" data-cat={c.value}>{c.label}</button>)}
+        </div>
+      )}
+      <h1 class="section-title reveal">Novetats</h1>
+
+      {destacat && (
+        <a href={`/blog/${destacat.slug}`} class="destacat reveal" data-cat={destacat.categoria ?? ''}>
+          <div class="destacat-text">
+            <h2>{destacat.titol}</h2>
+            {destacat.extracte && <p>{destacat.extracte}</p>}
+            <span class="destacat-more">Llegir més →</span>
+          </div>
+          {destacat.imatgePrincipal && <img src={destacat.imatgePrincipal} alt={destacat.titol} loading="eager" />}
+        </a>
+      )}
+
+      <div class="grid-3 reveal-stagger">
+        {resta.map((post) => (
+          <div class="reveal-item noticia-item" data-cat={post.categoria ?? ''}>
+            <BlogCard {...post} />
+          </div>
+        ))}
       </div>
+      <p id="noticies-empty" class="empty" hidden>Cap entrada en aquesta categoria.</p>
     </div>
   </section>
 </Layout>
+
+<script>
+  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-btn'));
+  const items = Array.from(document.querySelectorAll<HTMLElement>('.noticia-item, .destacat'));
+  const empty = document.getElementById('noticies-empty');
+
+  btns.forEach((btn) => btn.addEventListener('click', () => {
+    btns.forEach((b) => b.classList.toggle('active', b === btn));
+    const cat = btn.dataset.cat ?? 'tot';
+    let visibles = 0;
+    items.forEach((el) => {
+      const show = cat === 'tot' || el.dataset.cat === cat;
+      el.style.display = show ? '' : 'none';
+      if (show) visibles++;
+    });
+    empty?.toggleAttribute('hidden', visibles > 0);
+  }));
+</script>
+
+<style>
+  .filters { display: flex; gap: 1.1rem; flex-wrap: wrap; justify-content: flex-end; margin-bottom: var(--spacing-sm); }
+  .filter-btn {
+    background: none;
+    border: none;
+    padding: 0.2rem 0;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .filter-btn:hover { color: var(--color-ink); }
+  .filter-btn.active { color: var(--color-ink); font-weight: 800; border-bottom-color: var(--color-brand-red); }
+
+  /* Wireframe: entrada destacada amb text + imatge */
+  .destacat {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--spacing-md);
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    text-decoration: none;
+  }
+  .destacat:hover { text-decoration: none; }
+  .destacat h2 { margin-bottom: 0.75rem; }
+  .destacat p { color: var(--color-gray-dark); line-height: 1.7; margin-bottom: 0.75rem; }
+  .destacat-more { font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .destacat img { width: 100%; }
+  .destacat:hover h2 { text-decoration: underline; }
+  .empty { color: var(--color-gray-dark); padding: var(--spacing-md) 0; }
+  @media (max-width: 768px) { .destacat { grid-template-columns: 1fr; } }
+</style>

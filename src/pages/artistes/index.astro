@@ -6,13 +6,15 @@ import { getArtistes } from '../../lib/sanity';
 const artistes = await getArtistes();
 ---
 
-<Layout title="Artistes">
+<Layout title="Artistes" description="Els artistes de l'Espai Barri Vell">
   <section class="section">
     <div class="container">
-      <h1 class="section-title">Artistes</h1>
-      <div class="grid-3">
+      <h1 class="section-title reveal">Els nostres artistes</h1>
+      <div class="grid-3 reveal-stagger">
         {artistes.map(artista => (
-          <ArtistCard {...artista} />
+          <div class="reveal-item">
+            <ArtistCard {...artista} />
+          </div>
         ))}
       </div>
     </div>

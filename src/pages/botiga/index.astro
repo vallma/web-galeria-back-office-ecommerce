@@ -4,24 +4,119 @@ import ArtworkCard from '../../components/ArtworkCard.astro';
 import { getObres } from '../../lib/sanity';
 
 const obres = await getObres();
+const totes = [
+  { value: 'quadres', label: 'Quadres' },
+  { value: 'escultures', label: 'Escultures' },
+  { value: 'edicions', label: 'Edicions' },
+  { value: 'petit-objectes', label: 'Petit objectes' },
+  { value: 'tallers', label: 'Tallers' },
+];
+const cats = totes.filter(c => obres.some((o: { categoria?: string }) => o.categoria === c.value));
 ---
 
 <Layout title="Botiga" description="Adquireix obra original dels artistes de l'Espai Barri Vell">
   <section class="section">
     <div class="container">
-      <h1 class="section-title">Botiga</h1>
+      <h1 class="section-title reveal">Botiga</h1>
+
       {obres.length === 0
         ? <p class="empty">Ara mateix no hi ha obres disponibles. Torna aviat!</p>
         : (
-          <div class="grid-4">
-            {obres.map(obra => <ArtworkCard {...obra} />)}
-          </div>
+          <>
+            <!-- Wireframe: filtres per categoria + cercador -->
+            <div class="botiga-controls reveal">
+              <div class="filters" role="group" aria-label="Filtra per categoria">
+                <button class="filter-btn active" data-cat="tot">Tot</button>
+                {cats.map(c => <button class="filter-btn" data-cat={c.value}>{c.label}</button>)}
+              </div>
+              <input type="search" id="botiga-search" placeholder="Cerca obra, artista, tècnica…" aria-label="Cerca a la botiga" />
+            </div>
+
+            <div class="grid-3 reveal-stagger" id="botiga-grid">
+              {obres.map((obra) => (
+                <div
+                  class="reveal-item botiga-item"
+                  data-cat={obra.categoria ?? ''}
+                  data-text={`${obra.titol} ${obra.artista?.nom ?? ''} ${obra.tecnica ?? ''}`.toLowerCase()}
+                >
+                  <ArtworkCard {...obra} />
+                </div>
+              ))}
+            </div>
+            <p id="botiga-empty" class="empty" hidden>Cap obra coincideix amb la cerca.</p>
+          </>
         )
       }
     </div>
   </section>
 </Layout>
 
+<script>
+  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-btn'));
+  const search = document.getElementById('botiga-search') as HTMLInputElement | null;
+  const items = Array.from(document.querySelectorAll<HTMLElement>('.botiga-item'));
+  const empty = document.getElementById('botiga-empty');
+
+  let cat = 'tot';
+  let text = '';
+
+  function apply() {
+    let visibles = 0;
+    items.forEach((el) => {
+      const okCat = cat === 'tot' || el.dataset.cat === cat;
+      const okText = !text || (el.dataset.text ?? '').includes(text);
+      const show = okCat && okText;
+      el.style.display = show ? '' : 'none';
+      if (show) visibles++;
+    });
+    empty?.toggleAttribute('hidden', visibles > 0);
+  }
+
+  btns.forEach((btn) => btn.addEventListener('click', () => {
+    btns.forEach((b) => b.classList.toggle('active', b === btn));
+    cat = btn.dataset.cat ?? 'tot';
+    apply();
+  }));
+  search?.addEventListener('input', () => {
+    text = search.value.trim().toLowerCase();
+    apply();
+  });
+</script>
+
 <style>
   .empty { color: var(--color-gray-dark); font-size: 1rem; padding: var(--spacing-lg) 0; }
+  .botiga-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-md);
+  }
+  .filters { display: flex; gap: 1.1rem; flex-wrap: wrap; }
+  .filter-btn {
+    background: none;
+    border: none;
+    padding: 0.2rem 0;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .filter-btn:hover { color: var(--color-ink); }
+  .filter-btn.active { color: var(--color-ink); font-weight: 800; border-bottom-color: var(--color-brand-red); }
+  #botiga-search {
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-cream);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    min-width: 240px;
+    border-radius: 999px;
+    outline: none;
+  }
+  #botiga-search:focus { border-color: var(--color-ink); }
+  @media (max-width: 600px) { #botiga-search { width: 100%; } }
 </style>

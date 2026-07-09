@@ -12,39 +12,105 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const artista = await getArtistaBySlug(slug);
 if (!artista) return Astro.redirect('/artistes');
+
+const obres = (artista.obres ?? []).filter((o: { img?: string }) => o.img);
+const imatgeGran = obres[0]?.img ?? artista.foto;
 ---
 
 <Layout title={artista.nom} description={`Artista de l'Espai Barri Vell — ${artista.nom}`}>
+  <!-- Wireframe: nom + imatge gran + miniatures de la seva obra -->
   <section class="section">
-    <div class="container artista-layout">
-      <div class="artista-header">
-        {artista.foto && <img src={artista.foto} alt={artista.nom} class="artista-foto" />}
-        <div>
-          <p class="breadcrumb"><a href="/artistes">Artistes</a> / {artista.nom}</p>
-          <h1>{artista.nom}</h1>
-          {artista.bio && <div class="prose" set:html={toHTML(artista.bio)} />}
-        </div>
-      </div>
-      {artista.exposicions?.length > 0 && (
-        <div class="artista-exposicions">
-          <h2 class="section-title">Exposicions</h2>
-          <div class="grid-3">
-            {artista.exposicions.map(exp => <ExhibitionCard {...exp} />)}
-          </div>
+    <div class="container">
+      <p class="breadcrumb reveal"><a href="/artistes">Artistes</a> / {artista.nom}</p>
+      <h1 class="reveal">{artista.nom}</h1>
+
+      {imatgeGran && (
+        <div class="galeria reveal">
+          <img src={imatgeGran} alt={`Obra de ${artista.nom}`} class="galeria-gran" id="galeria-gran" />
+          {obres.length > 1 && (
+            <div class="galeria-thumbs">
+              {obres.slice(0, 6).map((o) => (
+                <button class="thumb" data-img={o.img} aria-label={o.titol}>
+                  <img src={o.img} alt={o.titol} loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
   </section>
+
+  <!-- Wireframe: Sobre l'artista -->
+  {artista.bio && (
+    <section class="section sobre">
+      <div class="container sobre-grid">
+        <div class="reveal">
+          <h2 class="section-title">Sobre {artista.nom}</h2>
+          <div class="prose" set:html={toHTML(artista.bio)} />
+        </div>
+        {artista.foto && <img src={artista.foto} alt={artista.nom} class="sobre-foto reveal" loading="lazy" />}
+      </div>
+    </section>
+  )}
+
+  <!-- Wireframe: Exposicions -->
+  {artista.exposicions?.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title reveal">Exposicions</h2>
+        <div class="grid-3 reveal-stagger">
+          {artista.exposicions.map(exp => (
+            <div class="reveal-item">
+              <ExhibitionCard {...exp} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {obres.length > 0 && (
+    <section class="section obres-cta">
+      <div class="container reveal">
+        <a href="/botiga" class="btn btn-primary">Veure obra disponible a la botiga</a>
+      </div>
+    </section>
+  )}
 </Layout>
 
+<script>
+  const gran = document.getElementById('galeria-gran') as HTMLImageElement | null;
+  document.querySelectorAll<HTMLButtonElement>('.thumb').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (gran && btn.dataset.img) gran.src = btn.dataset.img;
+      document.querySelectorAll('.thumb').forEach((t) => t.classList.toggle('active', t === btn));
+    });
+  });
+</script>
+
 <style>
-  .artista-layout { max-width: 900px; }
-  .artista-header { display: grid; grid-template-columns: 280px 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-  .artista-foto { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 1rem; }
+  .breadcrumb { font-size: 0.8rem; color: var(--color-gray-light); margin-bottom: 0.75rem; }
   .breadcrumb a { color: var(--color-gray-dark); }
-  h1 { margin-bottom: var(--spacing-sm); }
-  .prose { font-size: 1rem; line-height: 1.8; color: var(--color-gray-dark); }
+  h1 { margin-bottom: var(--spacing-md); }
+
+  .galeria { max-width: 860px; margin: 0 auto; }
+  .galeria-gran { width: 100%; max-height: 70vh; object-fit: contain; background: var(--color-cream); }
+  .galeria-thumbs { display: flex; gap: 0.6rem; justify-content: center; margin-top: 0.75rem; flex-wrap: wrap; }
+  .thumb { border: 2px solid transparent; background: none; padding: 0; cursor: pointer; width: 72px; height: 72px; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb.active, .thumb:hover { border-color: var(--color-ink); }
+
+  .sobre { background: var(--color-cream); }
+  .sobre-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--spacing-lg); align-items: start; }
+  .sobre-foto { width: 100%; max-width: 340px; justify-self: end; }
+  .prose { font-size: 0.95rem; line-height: 1.8; color: var(--color-gray-dark); }
   .prose p { margin-bottom: 1em; }
-  @media (max-width: 768px) { .artista-header { grid-template-columns: 1fr; } }
+
+  .obres-cta { text-align: center; padding-top: 0; }
+
+  @media (max-width: 768px) {
+    .sobre-grid { grid-template-columns: 1fr; }
+    .sobre-foto { justify-self: start; }
+  }
 </style>

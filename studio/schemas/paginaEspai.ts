@@ -9,6 +9,20 @@ export const paginaEspai = defineType({
     defineField({ name: 'titol', title: 'Títol', type: 'string', initialValue: "L'Espai" }),
     defineField({ name: 'cos', title: 'Text', type: 'array', of: [{ type: 'block' }] }),
     defineField({ name: 'imatges', title: 'Imatges', type: 'array', of: [{ type: 'image', options: { hotspot: true } }] }),
+    defineField({
+      name: 'equip',
+      title: 'Equip',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          { name: 'nom', title: 'Nom', type: 'string' },
+          { name: 'carrec', title: 'Càrrec', type: 'string' },
+          { name: 'foto', title: 'Foto', type: 'image', options: { hotspot: true } },
+        ],
+        preview: { select: { title: 'nom', subtitle: 'carrec', media: 'foto' } },
+      }],
+    }),
   ],
   preview: { prepare: () => ({ title: "Pàgina L'Espai" }) },
 });

@@ -8,6 +8,20 @@ export const post = defineType({
     defineField({ name: 'titol', title: 'Títol', type: 'string', validation: r => r.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'titol' }, validation: r => r.required() }),
     defineField({ name: 'dataPublicacio', title: 'Data de publicació', type: 'datetime', initialValue: () => new Date().toISOString() }),
+    defineField({
+      name: 'categoria',
+      title: 'Categoria',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Notícies', value: 'noticies' },
+          { title: 'Esdeveniments', value: 'esdeveniments' },
+          { title: 'Exposicions', value: 'exposicions' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'noticies',
+    }),
     defineField({ name: 'extracte', title: 'Extracte', type: 'text', rows: 3 }),
     defineField({ name: 'imatgePrincipal', title: 'Imatge principal', type: 'image', options: { hotspot: true } }),
     defineField({

@@ -4,34 +4,111 @@ import { getPaginaEspai } from '../lib/sanity';
 import { toHTML } from '@portabletext/to-html';
 
 const espai = await getPaginaEspai();
+const imatgeSobre = espai?.imatges?.[0];
+const imatgeLocacio = espai?.imatges?.[1] ?? espai?.imatges?.[0];
+const equip = espai?.equip ?? [];
 ---
 
-<Layout title="Espai" description="Coneix l'Espai Barri Vell, galeria d'art al cor de Girona">
-  <section class="section">
-    <div class="container espai-layout">
-      <div class="espai-content">
-        <h1>{espai?.titol ?? "L'Espai"}</h1>
-        {espai?.cos && (
-          <div class="prose" set:html={toHTML(espai.cos)} />
-        )}
+<Layout title="Espai" description="Coneix l'Espai Barri Vell, galeria d'art al cor del casc antic de Girona">
+  <!-- Wireframe: statement -->
+  <section class="statement">
+    <div class="container">
+      <h1 class="reveal">Una galeria d'art al cor del casc antic de Girona</h1>
+      <a href="#sobre" class="coneix reveal">Coneix-nos ↓</a>
+    </div>
+  </section>
+
+  <!-- Wireframe: sobre la galeria -->
+  <section class="section" id="sobre">
+    <div class="container sobre-grid">
+      <div class="reveal">
+        <h2 class="section-title">Sobre la galeria</h2>
+        {espai?.cos && <div class="prose" set:html={toHTML(espai.cos)} />}
       </div>
-      {espai?.imatges?.length > 0 && (
-        <div class="espai-images">
-          {espai.imatges.map((url: string) => (
-            <img src={url} alt="Espai Barri Vell" loading="lazy" />
+      {imatgeSobre && <img src={imatgeSobre} alt="Espai Barri Vell" class="sobre-img reveal" loading="lazy" />}
+    </div>
+  </section>
+
+  <!-- Wireframe: locació sobre fons de color -->
+  <section class="locacio">
+    <div class="container locacio-grid">
+      <div class="reveal">
+        <h2 class="section-title">Locació</h2>
+        <p class="locacio-adreca">Plaça dels Lledoners, 1,<br />17004 Girona, Espanya</p>
+        <p class="locacio-nota">Al costat del Museu d'Art de Girona, al casc antic.</p>
+      </div>
+      <div class="reveal">
+        {imatgeLocacio
+          ? <img src={imatgeLocacio} alt="Ubicació de la galeria" loading="lazy" />
+          : <iframe
+              title="Mapa — Espai Barri Vell"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=2.8225%2C41.9865%2C2.8280%2C41.9895&layer=mapnik&marker=41.988%2C2.8253"
+              loading="lazy"
+            ></iframe>
+        }
+        <p class="locacio-horaris">Dimarts – Divendres: 10–13h i 15–19h<br />Dissabtes: 11–19h · Tancat diumenges i dilluns</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wireframe: equip -->
+  {equip.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title reveal">L'equip</h2>
+        <div class="equip-grid reveal-stagger">
+          {equip.map((m) => (
+            <div class="membre reveal-item">
+              {m.foto ? <img src={m.foto} alt={m.nom} loading="lazy" /> : <div class="membre-noimg"></div>}
+              <p class="membre-nom">{m.nom}</p>
+              {m.carrec && <p class="membre-carrec">{m.carrec}</p>}
+            </div>
           ))}
         </div>
-      )}
+      </div>
+    </section>
+  )}
+
+  <!-- Wireframe: contacta'ns -->
+  <section class="section contacta">
+    <div class="container reveal">
+      <h2 class="section-title">Contacta'ns</h2>
+      <p>Escriu-nos per a consultes sobre obres, artistes o col·laboracions.</p>
+      <a href="/contacte" class="btn btn-primary">Anar al formulari de contacte</a>
     </div>
   </section>
 </Layout>
 
 <style>
-  .espai-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); align-items: start; }
-  .espai-content h1 { margin-bottom: var(--spacing-md); }
-  .prose { font-size: 1rem; line-height: 1.8; color: var(--color-gray-dark); }
+  .statement { padding: calc(var(--spacing-xl) * 1.4) 0; text-align: center; }
+  .statement h1 { font-size: clamp(1.75rem, 4vw, 2.6rem); max-width: 720px; margin: 0 auto var(--spacing-md); }
+  .coneix { font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .sobre-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--spacing-lg); align-items: start; }
+  .sobre-img { width: 100%; }
+  .prose { font-size: 0.95rem; line-height: 1.8; color: var(--color-gray-dark); }
   .prose p { margin-bottom: 1em; }
-  .espai-images { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-  .espai-images img { width: 100%; }
-  @media (max-width: 768px) { .espai-layout { grid-template-columns: 1fr; } }
+
+  /* Locació: bloc de color corporatiu (wireframe) */
+  .locacio { background: var(--color-cream); padding: var(--spacing-xl) 0; }
+  .locacio-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--spacing-lg); align-items: center; }
+  .locacio-adreca { font-size: 1.05rem; font-weight: 800; line-height: 1.6; margin-bottom: 0.75rem; }
+  .locacio-nota { color: var(--color-gray-dark); font-size: 0.9rem; }
+  .locacio-grid img, .locacio-grid iframe { width: 100%; min-height: 300px; border: none; display: block; object-fit: cover; }
+  .locacio-horaris { text-align: right; margin-top: 0.75rem; font-size: 0.85rem; color: var(--color-gray-dark); }
+
+  .equip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); max-width: 760px; }
+  .membre img, .membre-noimg { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: var(--color-cream); margin-bottom: 0.6rem; }
+  .membre-nom { font-weight: 800; font-size: 0.9rem; }
+  .membre-carrec { font-size: 0.85rem; color: var(--color-gray-dark); }
+
+  .contacta { text-align: center; }
+  .contacta .section-title { text-align: left; }
+  .contacta p { margin-bottom: var(--spacing-sm); color: var(--color-gray-dark); }
+
+  @media (max-width: 768px) {
+    .sobre-grid, .locacio-grid { grid-template-columns: 1fr; }
+    .equip-grid { grid-template-columns: 1fr 1fr; }
+    .locacio-horaris { text-align: left; }
+  }
 </style>
