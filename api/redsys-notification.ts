@@ -2,7 +2,7 @@
 // autorizado, marca la obra como vendida en Sanity.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@sanity/client';
-import { decodeParams, verifySignature, isAuthorized } from './_lib/redsys';
+import { decodeParams, verifySignature, isAuthorized } from './_lib/redsys.js';
 
 const sanity = createClient({
   projectId: (process.env.SANITY_PROJECT_ID ?? process.env.PUBLIC_SANITY_PROJECT_ID)!,
