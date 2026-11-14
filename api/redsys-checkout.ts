@@ -2,7 +2,7 @@
 // y devuelve un formulario auto-enviado hacia el TPV de BBVA/Redsys.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@sanity/client';
-import { REDSYS_URL, encodeParams, sign, makeOrderNumber } from './_lib/redsys';
+import { REDSYS_URL, encodeParams, sign, makeOrderNumber } from './_lib/redsys.js';
 
 const sanity = createClient({
   projectId: (process.env.SANITY_PROJECT_ID ?? process.env.PUBLIC_SANITY_PROJECT_ID)!,
